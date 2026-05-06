@@ -17,10 +17,11 @@ public class Main extends SscAssignment {
         FileSaver saver = new FileSaver();
         LinkExtractor extractor = new HtmlLinkExtractor();
         UrlNormalizer normalizer = new UrlNormalizer(allowedHost);
+        ProgressReporter reporter = new ConsoleProgressReporter();
 
 
         try (HttpDownloader downloader = new HttpDownloader()) {
-            WebCrawler crawler = new WebCrawler(downloader, extractor, normalizer, mapper, saver);
+            WebCrawler crawler = new WebCrawler(downloader, extractor, normalizer, mapper, saver, reporter);
             crawler.crawl(seed);
         } catch (Exception e) {
             throw new RuntimeException("Failed to close HTTP client", e);

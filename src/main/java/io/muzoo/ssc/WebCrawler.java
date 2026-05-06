@@ -17,13 +17,15 @@ public class WebCrawler {
     private final UrlNormalizer urlNormalizer;
     private final UrlToPathMapper pathMapper;
     private final FileSaver fileSaver;
+    private final ProgressReporter progressReporter;
 
-    public WebCrawler(Downloader downloader, LinkExtractor linkExtractor, UrlNormalizer urlNormalizer, UrlToPathMapper pathMapper, FileSaver fileSaver){
+    public WebCrawler(Downloader downloader, LinkExtractor linkExtractor, UrlNormalizer urlNormalizer, UrlToPathMapper pathMapper, FileSaver fileSaver, ProgressReporter progressReporter){
         this.downloader = downloader;
         this.linkExtractor = linkExtractor;
         this.urlNormalizer = urlNormalizer;
         this.pathMapper = pathMapper;
         this.fileSaver = fileSaver;
+        this.progressReporter = progressReporter;
     }
 
     public void crawl(String seed){
@@ -37,10 +39,13 @@ public class WebCrawler {
         queue.add(normalizedSeed.get());
         visited.add(normalizedSeed.get());
 
+        int downloaded = 0;
         while (!queue.isEmpty()){
             String currentUrl = queue.poll();
+            progressReporter.report(downloaded, visited.size(), currentUrl);
             try{
                 Set<String> discovered = processUrl(currentUrl);
+                downloaded++;
                 for (String link : discovered){
                     if (visited.add(link)) {
                         queue.add(link);
@@ -57,7 +62,6 @@ public class WebCrawler {
         DownloadResult result = downloader.download(currentUrl);
         Path diskPath = pathMapper.toPath(currentUrl);
         fileSaver.save(diskPath, result.body());
-        System.out.println("Downloaded " + currentUrl + " -> " + diskPath);
 
         if (!result.isHtml()){
             return Set.of();
