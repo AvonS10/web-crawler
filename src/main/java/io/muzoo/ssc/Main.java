@@ -2,6 +2,7 @@ package io.muzoo.ssc;
 
 import io.muzoo.ssc.assignment.tracker.SscAssignment;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.net.URI;
@@ -23,8 +24,8 @@ public class Main extends SscAssignment {
         try (HttpDownloader downloader = new HttpDownloader()) {
             WebCrawler crawler = new WebCrawler(downloader, extractor, normalizer, mapper, saver, reporter);
             crawler.crawl(seed);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to close HTTP client", e);
+        } catch (IOException e) {
+            throw new RuntimeException("Crawl failed", e);
         }
     }
 }

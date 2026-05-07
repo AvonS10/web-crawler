@@ -28,7 +28,7 @@ public class WebCrawler {
         this.progressReporter = progressReporter;
     }
 
-    public void crawl(String seed){
+    public void crawl(String seed) throws IOException{
         Optional<String> normalizedSeed = urlNormalizer.normalize(seed, seed);
         if (normalizedSeed.isEmpty()){
             throw new IllegalArgumentException("Seed URL was rejected by normalizer: " + seed);
@@ -51,8 +51,8 @@ public class WebCrawler {
                         queue.add(link);
                     }
                 }
-            } catch (IOException e){
-                System.err.println("Failed to process " + currentUrl + ": " + e.getMessage());
+            } catch (DownloadException e){
+                System.err.println("! Skipped " + currentUrl + ": " + e.getMessage());
             }
         }
     }
